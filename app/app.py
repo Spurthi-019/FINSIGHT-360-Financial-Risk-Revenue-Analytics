@@ -1,6 +1,7 @@
 import os
 import sys
 import re
+import importlib
 from pathlib import Path
 import streamlit as st
 import pandas as pd
@@ -11,6 +12,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import db_engine
 import llm_helper
+
+# Force reload modules so running Streamlit servers immediately pick up any code updates
+importlib.reload(db_engine)
+importlib.reload(llm_helper)
 
 # -----------------------------------------------------------------------------
 # 1. PAGE CONFIGURATION
@@ -367,12 +372,15 @@ if user_prompt:
                 result_df = db_engine.run_query(generated_sql)
 
                 # 2. Generate Executive Summary (Plain English)
-                executive_summary = llm_helper.generate_executive_summary(
-                    user_question=user_prompt, 
-                    df=result_df, 
-                    api_key=api_key, 
-                    provider=provider_param
-                )
+                try:
+                    executive_summary = llm_helper.generate_executive_summary(
+                        user_question=user_prompt, 
+                        df=result_df, 
+                        api_key=api_key, 
+                        provider=provider_param
+                    )
+                except Exception:
+                    executive_summary = llm_helper.generate_heuristic_summary(user_prompt, result_df)
 
                 # --- TOP-TO-BOTTOM RESPONSE ORDER ---
                 
