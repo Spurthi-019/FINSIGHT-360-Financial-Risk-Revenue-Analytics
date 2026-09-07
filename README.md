@@ -96,27 +96,33 @@ The Power BI model [`FINSIGHT 360.pbix`](./FINSIGHT%20360.pbix) comprises 6 exec
 
 ### Page 1: Executive Performance Overview
 *Macro Financial KPIs, GMV trajectory, channel conversion waterfall, and global success/failure metrics.*
-![Page 1 - Executive Overview](screenshots/page1_executive_overview.png)
+<img width="673" height="380" alt="Screenshot 2026-09-07 151257" src="https://github.com/user-attachments/assets/2d0c2389-7c7f-419e-8be3-24a7fef85dda" />
+
 
 ### Page 2: Payment Performance & Gateway Reliability
 *SLA benchmarking across Razorpay, PayU, Cashfree, HDFC Direct, and Paytm Gateway with timeout drill-downs.*
-![Page 2 - Payment Performance](screenshots/page2_payment_performance.png)
+<img width="676" height="385" alt="Screenshot 2026-09-07 151318" src="https://github.com/user-attachments/assets/39566df6-0c2e-4df3-b579-0c1485b4eb86" />
+
 
 ### Page 3: Fraud & Risk Analytics
 *Clustering by risk scores, cross-border exposure, and time-of-day fraud spikes (12 AM - 5 AM nocturnal surge).*
-![Page 3 - Fraud & Risk Analytics](screenshots/page3_fraud_risk_analytics.png)
+<img width="678" height="383" alt="Screenshot 2026-09-07 151330" src="https://github.com/user-attachments/assets/de886f80-22a0-4216-829d-cfa0035640cf" />
+
 
 ### Page 4: Customer Intelligence & Segment Dynamics
 *High-Value at-risk customer churn matrix, credit score band analysis, and KYC friction points.*
-![Page 4 - Customer Intelligence](screenshots/page4_customer_intelligence.png)
+<img width="677" height="383" alt="Screenshot 2026-09-07 151342" src="https://github.com/user-attachments/assets/c4a4bdb5-267b-4247-8e74-a4cef52662ee" />
+
 
 ### Page 5: Revenue Risk & Pareto Concentration
 *80/20 loss distribution across 8,000 merchants and recoverable revenue opportunity via failover routing.*
-![Page 5 - Revenue Risk & Pareto](screenshots/page5_revenue_risk_pareto.png)
+<img width="680" height="388" alt="Screenshot 2026-09-07 151354" src="https://github.com/user-attachments/assets/57e478d8-d7d5-44a3-8bf6-0596aee7ac15" />
+
 
 ### Page 6: Executive Recommendations & Strategic Roadmap
 *Prescriptive action plan, dynamic routing ROI model, and automated risk throttling workflows.*
-![Page 6 - Executive Recommendations](screenshots/page6_executive_recommendations.png)
+<img width="679" height="383" alt="Screenshot 2026-09-07 151404" src="https://github.com/user-attachments/assets/1239483e-ef5e-4688-be76-30957d7d29b4" />
+
 
 ---
 
