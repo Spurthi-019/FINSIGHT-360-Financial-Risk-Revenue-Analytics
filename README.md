@@ -30,7 +30,7 @@ Download the complete interactive Power BI Desktop report (`FINSIGHT 360.pbix`, 
 
 ---
 
-## 🤖 Phase 6: Streamlit AI Financial Analyst Copilot
+## 🤖 Streamlit AI Financial Analyst Copilot
 
 The repository includes a production-ready, dark-mode glassmorphic AI Analyst Copilot deployed live at **[finsight-360-financial-risk-revenue-analytics.streamlit.app](https://finsight-360-financial-risk-revenue-analytics.streamlit.app/)**.
 
