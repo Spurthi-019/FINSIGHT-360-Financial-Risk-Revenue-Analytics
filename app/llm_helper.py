@@ -60,7 +60,7 @@ Your task is to translate natural language user questions into clean, valid, sta
    - failure_category (VARCHAR: 'None', 'Customer Side', 'Infrastructure', 'Risk & Compliance')
 
 ### BUSINESS METRIC RULES & CONSTRAINTS:
-1. Return ONLY the raw SQL query. DO NOT include markdown formatting, backticks (```), explanations, or notes.
+1. Return ONLY the raw executable SQL query. DO NOT include markdown formatting, backticks (```), explanations, or notes.
 2. Gross Merchandise Value (GMV) / Total Volume = SUM(amount).
 3. Revenue at Risk (Failed Volume) = SUM(amount) WHERE transaction_status = 'FAILED' (or failure_reason_id > 0).
 4. Fraud Blocked Volume = SUM(amount) WHERE transaction_status = 'FRAUD_BLOCKED' (or is_fraud = 1).
@@ -73,7 +73,6 @@ Your task is to translate natural language user questions into clean, valid, sta
 def clean_sql_output(raw_text: str) -> str:
     """Strips markdown fences and whitespace from LLM response."""
     cleaned = raw_text.strip()
-    # Remove markdown code blocks if present
     cleaned = re.sub(r"^```(?:sql)?\s*", "", cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r"\s*```$", "", cleaned)
     return cleaned.strip()
@@ -82,21 +81,64 @@ def rule_based_fallback_sql(question: str) -> str:
     """High-accuracy semantic pattern matcher for instant offline/demo analysis."""
     q = question.lower().strip()
 
-    if any(k in q for k in ["macro", "kpi", "overview", "executive", "gmv", "total volume", "summary"]):
+    # Top merchants by failed volume
+    if any(k in q for k in ["top 10 merchant", "top merchants", "merchant loss", "merchant by failed"]):
         return """
         SELECT 
-            COUNT(*) AS total_transactions,
-            ROUND(SUM(amount), 2) AS total_gmv_inr,
-            ROUND(SUM(CASE WHEN transaction_status = 'SUCCESS' THEN amount ELSE 0 END), 2) AS successful_volume_inr,
-            ROUND(SUM(CASE WHEN transaction_status = 'FAILED' THEN amount ELSE 0 END), 2) AS revenue_at_risk_inr,
-            ROUND(SUM(CASE WHEN transaction_status = 'FRAUD_BLOCKED' THEN amount ELSE 0 END), 2) AS fraud_blocked_inr,
-            ROUND(COUNT(CASE WHEN transaction_status = 'SUCCESS' THEN 1 END) * 100.0 / COUNT(*), 2) AS success_rate_pct,
-            ROUND(COUNT(CASE WHEN transaction_status = 'FAILED' THEN 1 END) * 100.0 / COUNT(*), 2) AS failure_rate_pct,
-            ROUND(COUNT(CASE WHEN transaction_status = 'FRAUD_BLOCKED' THEN 1 END) * 100.0 / COUNT(*), 2) AS fraud_rate_pct
-        FROM fact_transactions
+            dm.merchant_id,
+            dm.merchant_name,
+            dm.merchant_category,
+            dm.city,
+            COUNT(ft.transaction_id) AS failed_txn_count,
+            ROUND(SUM(ft.amount), 2) AS total_lost_revenue_inr
+        FROM fact_transactions ft
+        JOIN dim_merchants dm ON ft.merchant_id = dm.merchant_id
+        WHERE ft.transaction_status = 'FAILED'
+        GROUP BY dm.merchant_id, dm.merchant_name, dm.merchant_category, dm.city
+        ORDER BY total_lost_revenue_inr DESC
+        LIMIT 10
         """
 
-    if any(k in q for k in ["failure reason", "leakage", "why did transactions fail", "top failures", "failure breakdown"]):
+    # Gateway failure rate in Tier-2 cities
+    if any(k in q for k in ["gateway", "tier-2", "tier 2", "highest failure rate in tier"]):
+        return """
+        SELECT 
+            ft.gateway,
+            COUNT(ft.transaction_id) AS total_attempts,
+            COUNT(CASE WHEN ft.transaction_status = 'FAILED' THEN 1 END) AS failed_attempts,
+            ROUND(COUNT(CASE WHEN ft.transaction_status = 'FAILED' THEN 1 END) * 100.0 / COUNT(*), 2) AS failure_rate_pct,
+            COUNT(CASE WHEN dfr.failure_reason_code = 'GATEWAY_TIMEOUT' THEN 1 END) AS timeout_count,
+            ROUND(SUM(CASE WHEN ft.transaction_status = 'FAILED' THEN ft.amount ELSE 0 END), 2) AS lost_volume_inr
+        FROM fact_transactions ft
+        JOIN dim_customers dc ON ft.customer_id = dc.customer_id
+        JOIN dim_failure_reasons dfr ON ft.failure_reason_id = dfr.failure_reason_id
+        WHERE dc.city = 'Tier-2 Cities'
+        GROUP BY ft.gateway
+        ORDER BY failure_rate_pct DESC
+        """
+
+    # Off-hours transactions over 5000 flagged for fraud
+    if any(k in q for k in ["off-hours", "off hours", "nocturnal", "over 5000", "over 5,000", "flagged for fraud"]):
+        return """
+        SELECT 
+            ft.transaction_id,
+            ft.transaction_timestamp,
+            ft.amount AS transaction_amount_inr,
+            ft.gateway,
+            dpm.payment_method_name,
+            ft.risk_score,
+            ft.device_type
+        FROM fact_transactions ft
+        JOIN dim_payment_methods dpm ON ft.payment_method_id = dpm.payment_method_id
+        WHERE ft.is_fraud = 1
+          AND ft.amount > 5000
+          AND CAST(SUBSTR(ft.transaction_timestamp, 12, 2) AS INT) BETWEEN 0 AND 5
+        ORDER BY ft.amount DESC
+        LIMIT 20
+        """
+
+    # Failure reason decomposition
+    if any(k in q for k in ["failure reason", "leakage", "why did transactions fail", "top failures", "failure breakdown", "revenue lost"]):
         return """
         SELECT 
             dfr.failure_reason_code,
@@ -112,23 +154,8 @@ def rule_based_fallback_sql(question: str) -> str:
         ORDER BY total_lost_amount_inr DESC
         """
 
-    if any(k in q for k in ["gateway", "sla", "razorpay", "payu", "cashfree", "hdfc", "paytm", "acquirer"]):
-        return """
-        SELECT 
-            ft.gateway,
-            COUNT(ft.transaction_id) AS total_transactions,
-            ROUND(SUM(ft.amount), 2) AS total_volume_inr,
-            ROUND(COUNT(CASE WHEN ft.transaction_status = 'SUCCESS' THEN 1 END) * 100.0 / COUNT(*), 2) AS success_rate_pct,
-            COUNT(CASE WHEN dfr.failure_reason_code = 'GATEWAY_TIMEOUT' THEN 1 END) AS timeout_count,
-            COUNT(CASE WHEN dfr.failure_reason_code = 'TECHNICAL_ERROR' THEN 1 END) AS technical_error_count,
-            ROUND(SUM(CASE WHEN ft.transaction_status = 'FAILED' THEN ft.amount ELSE 0 END), 2) AS total_lost_volume_inr
-        FROM fact_transactions ft
-        JOIN dim_failure_reasons dfr ON ft.failure_reason_id = dfr.failure_reason_id
-        GROUP BY ft.gateway
-        ORDER BY total_lost_volume_inr DESC
-        """
-
-    if any(k in q for k in ["july", "peak", "tier-2", "tier 2", "evening", "upi anomaly", "hour"]):
+    # July peak UPI anomaly
+    if any(k in q for k in ["july", "peak", "evening", "upi anomaly"]):
         return """
         SELECT 
             CAST(SUBSTR(ft.transaction_timestamp, 12, 2) AS INT) AS hour_of_day,
@@ -147,24 +174,8 @@ def rule_based_fallback_sql(question: str) -> str:
         ORDER BY hour_of_day ASC
         """
 
-    if any(k in q for k in ["merchant", "pareto", "top 5 merchant", "top 10 merchant", "highest loss merchant"]):
-        return """
-        SELECT 
-            dm.merchant_id,
-            dm.merchant_name,
-            dm.merchant_category,
-            dm.city,
-            COUNT(ft.transaction_id) AS failed_txn_count,
-            ROUND(SUM(ft.amount), 2) AS total_lost_revenue_inr
-        FROM fact_transactions ft
-        JOIN dim_merchants dm ON ft.merchant_id = dm.merchant_id
-        WHERE ft.transaction_status = 'FAILED'
-        GROUP BY dm.merchant_id, dm.merchant_name, dm.merchant_category, dm.city
-        ORDER BY total_lost_revenue_inr DESC
-        LIMIT 10
-        """
-
-    if any(k in q for k in ["customer", "churn", "high value", "high-value", "at-risk", "at risk", "segment"]):
+    # High value customer churn
+    if any(k in q for k in ["customer", "churn", "high value", "high-value", "at-risk", "at risk", "spend > 25"]):
         return """
         SELECT 
             dc.customer_id,
@@ -184,48 +195,28 @@ def rule_based_fallback_sql(question: str) -> str:
         LIMIT 15
         """
 
-    if any(k in q for k in ["fraud", "nocturnal", "off-hours", "night", "international"]):
+    # Macro KPI overview
+    if any(k in q for k in ["macro", "kpi", "overview", "executive", "gmv", "total volume", "summary"]):
         return """
         SELECT 
-            CASE 
-                WHEN CAST(SUBSTR(ft.transaction_timestamp, 12, 2) AS INT) BETWEEN 0 AND 5 THEN 'Off-Hours (12 AM - 5 AM)'
-                ELSE 'Standard Hours (6 AM - 11 PM)'
-            END AS time_window,
             COUNT(*) AS total_transactions,
-            ROUND(SUM(amount), 2) AS total_volume_inr,
-            COUNT(CASE WHEN is_fraud = 1 THEN 1 END) AS fraud_count,
-            ROUND(SUM(CASE WHEN is_fraud = 1 THEN amount ELSE 0 END), 2) AS fraud_volume_inr,
-            ROUND(COUNT(CASE WHEN is_fraud = 1 THEN 1 END) * 100.0 / COUNT(*), 2) AS fraud_rate_pct
-        FROM fact_transactions ft
-        GROUP BY CASE 
-            WHEN CAST(SUBSTR(ft.transaction_timestamp, 12, 2) AS INT) BETWEEN 0 AND 5 THEN 'Off-Hours (12 AM - 5 AM)'
-            ELSE 'Standard Hours (6 AM - 11 PM)'
-        END
-        ORDER BY fraud_rate_pct DESC
+            ROUND(SUM(amount), 2) AS total_gmv_inr,
+            ROUND(SUM(CASE WHEN transaction_status = 'SUCCESS' THEN amount ELSE 0 END), 2) AS successful_volume_inr,
+            ROUND(SUM(CASE WHEN transaction_status = 'FAILED' THEN amount ELSE 0 END), 2) AS revenue_at_risk_inr,
+            ROUND(SUM(CASE WHEN transaction_status = 'FRAUD_BLOCKED' THEN amount ELSE 0 END), 2) AS fraud_blocked_inr,
+            ROUND(COUNT(CASE WHEN transaction_status = 'SUCCESS' THEN 1 END) * 100.0 / COUNT(*), 2) AS success_rate_pct,
+            ROUND(COUNT(CASE WHEN transaction_status = 'FAILED' THEN 1 END) * 100.0 / COUNT(*), 2) AS failure_rate_pct,
+            ROUND(COUNT(CASE WHEN transaction_status = 'FRAUD_BLOCKED' THEN 1 END) * 100.0 / COUNT(*), 2) AS fraud_rate_pct
+        FROM fact_transactions
         """
 
-    if any(k in q for k in ["payment method", "channel", "upi", "card", "wallet", "net banking"]):
-        return """
-        SELECT 
-            dpm.payment_method_name,
-            COUNT(ft.transaction_id) AS total_transactions,
-            ROUND(SUM(ft.amount), 2) AS total_volume_inr,
-            ROUND(AVG(ft.amount), 2) AS avg_ticket_size,
-            ROUND(COUNT(CASE WHEN ft.transaction_status = 'SUCCESS' THEN 1 END) * 100.0 / COUNT(*), 2) AS success_rate_pct,
-            ROUND(COUNT(CASE WHEN ft.transaction_status = 'FAILED' THEN 1 END) * 100.0 / COUNT(*), 2) AS failure_rate_pct
-        FROM fact_transactions ft
-        JOIN dim_payment_methods dpm ON ft.payment_method_id = dpm.payment_method_id
-        GROUP BY dpm.payment_method_name
-        ORDER BY total_volume_inr DESC
-        """
-
-    # Generic fallback
+    # General default
     return """
     SELECT 
         transaction_status,
         COUNT(*) AS transaction_count,
         ROUND(SUM(amount), 2) AS total_volume_inr,
-        ROUND(AVG(amount), 2) AS avg_amount_inr
+        ROUND(AVG(amount), 2) AS avg_ticket_size
     FROM fact_transactions
     GROUP BY transaction_status
     ORDER BY total_volume_inr DESC
@@ -258,7 +249,6 @@ def generate_sql(user_question: str, api_key: str = None, provider: str = "opena
     # 2. Try Google Gemini
     if (provider.lower() == "gemini" or not openai_key) and gemini_key:
         try:
-            # Try new google-genai SDK or google.generativeai
             try:
                 from google import genai
                 client = genai.Client(api_key=gemini_key)
