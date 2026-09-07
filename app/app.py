@@ -111,22 +111,16 @@ st.markdown("""
         box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
     }
 
-    /* Quick Prompt Chips */
-    .prompt-chip {
-        background: rgba(22, 27, 34, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 10px;
-        padding: 10px 14px;
-        color: #c9d1d9;
-        font-size: 0.88rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        margin-bottom: 8px;
-    }
-    .prompt-chip:hover {
-        background: rgba(56, 239, 125, 0.15);
-        border-color: #38ef7d;
-        color: #ffffff;
+    /* Executive Summary Callout Box */
+    .exec-summary-box {
+        background: rgba(13, 27, 42, 0.8);
+        border-left: 4px solid #38ef7d;
+        border-radius: 8px;
+        padding: 14px 18px;
+        margin-bottom: 16px;
+        color: #e6edf3;
+        font-size: 0.96rem;
+        line-height: 1.55;
     }
 
     /* Glassmorphism Expander & Container */
@@ -140,28 +134,64 @@ st.markdown("""
         background: rgba(22, 27, 34, 0.7);
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 12px;
-        padding: 14px 18px;
-        margin-bottom: 12px;
+        padding: 16px 20px;
+        margin-bottom: 14px;
         backdrop-filter: blur(8px);
     }
 </style>
 """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 3. SESSION STATE INITIALIZATION
+# 3. HELPER FUNCTIONS
+# -----------------------------------------------------------------------------
+def render_plotly_chart(df: pd.DataFrame):
+    """Renders an interactive dark-themed Plotly chart if numeric data is present."""
+    if df is None or len(df) <= 1:
+        return
+    numeric_cols = list(df.select_dtypes(include=[np.number]).columns)
+    text_cols = list(df.select_dtypes(exclude=[np.number]).columns)
+
+    if len(text_cols) >= 1 and len(numeric_cols) >= 1 and len(df) <= 30:
+        try:
+            import plotly.express as px
+            x_col = text_cols[0]
+            y_col = numeric_cols[0]
+            
+            fig = px.bar(
+                df, 
+                x=x_col, 
+                y=y_col, 
+                title=f"📊 {y_col.replace('_', ' ').title()} by {x_col.replace('_', ' ').title()}",
+                template="plotly_dark",
+                color=y_col,
+                color_continuous_scale=["#11998e", "#38ef7d", "#00f2fe", "#f59e0b"]
+            )
+            fig.update_layout(
+                paper_bgcolor="rgba(22, 27, 34, 0.75)",
+                plot_bgcolor="rgba(0, 0, 0, 0)",
+                margin=dict(l=20, r=20, t=40, b=20),
+                height=380,
+                font=dict(color="#e6edf3")
+            )
+            st.plotly_chart(fig, use_container_width=True)
+        except Exception:
+            pass
+
+# -----------------------------------------------------------------------------
+# 4. SESSION STATE INITIALIZATION
 # -----------------------------------------------------------------------------
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {
             "role": "assistant",
-            "content": "👋 Welcome to **FINSIGHT 360 AI Analyst Copilot**! Ask any financial, risk, or operational question to autonomously query the 300,000+ transaction Star Schema.",
+            "summary": "👋 Welcome to **FINSIGHT 360 AI Analyst Copilot**! Ask any financial, risk, or operational question to autonomously query our 300,000+ transaction Star Schema.",
             "sql": None,
             "df": None
         }
     ]
 
 # -----------------------------------------------------------------------------
-# 4. SIDEBAR CONTROLS & SCHEMA VISUALIZER
+# 5. SIDEBAR CONTROLS & SCHEMA VISUALIZER
 # -----------------------------------------------------------------------------
 with st.sidebar:
     st.markdown("## ⚙️ Copilot Control Center")
@@ -209,7 +239,7 @@ with st.sidebar:
         st.session_state.messages = [
             {
                 "role": "assistant",
-                "content": "Conversation history cleared. Ready for your next query!",
+                "summary": "Conversation history cleared. Ready for your next query!",
                 "sql": None,
                 "df": None
             }
@@ -217,7 +247,7 @@ with st.sidebar:
         st.rerun()
 
 # -----------------------------------------------------------------------------
-# 5. PAGE HEADER & ENTERPRISE KPI ROW
+# 6. PAGE HEADER & ENTERPRISE KPI ROW
 # -----------------------------------------------------------------------------
 header_col1, header_col2 = st.columns([3, 1])
 with header_col1:
@@ -260,7 +290,7 @@ with kpi_col3:
 st.markdown("<br>", unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 6. INTERACTIVE QUICK SAMPLE CHIPS
+# 7. INTERACTIVE QUICK SAMPLE CHIPS
 # -----------------------------------------------------------------------------
 st.markdown("#### 💡 Quick Analytical Inquiries")
 chip_col1, chip_col2, chip_col3, chip_col4 = st.columns(4)
@@ -282,18 +312,29 @@ with chip_col4:
 st.markdown("<br>", unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 7. CHAT EXPERIENCE & SQL EXECUTION ENGINE
+# 8. CHAT EXPERIENCE & RESPONSE FLOW RENDERING
 # -----------------------------------------------------------------------------
 
-# Render chat history
+# Render chat history with structured top-to-bottom order:
+# 1. 💬 Executive Summary (Plain English)
+# 2. 📊 Visual Chart (Plotly)
+# 3. 📋 Data Table (st.dataframe)
+# 4. 🔍 Technical Details (SQL Expander)
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
-        if msg.get("sql"):
-            with st.expander("🔍 View Executed SQL Query", expanded=False):
-                st.code(msg["sql"], language="sql")
+        if msg.get("summary"):
+            st.markdown(msg["summary"])
+        elif msg.get("content"):
+            st.markdown(msg["content"])
+        
         if msg.get("df") is not None:
+            render_plotly_chart(msg["df"])
+            st.markdown(f"**Detailed Data Records** (`{len(msg['df']):,}` rows returned):")
             st.dataframe(msg["df"], use_container_width=True)
+            
+        if msg.get("sql"):
+            with st.expander("🔍 Technical Details (SQL Query)", expanded=False):
+                st.code(msg["sql"], language="sql")
 
 # Chat Input handling (handles input box and quick chips)
 user_prompt = st.chat_input("💬 Ask a question about revenue risk, merchants, gateways, fraud, or customers...")
@@ -306,9 +347,9 @@ if user_prompt:
     with st.chat_message("user"):
         st.markdown(f"**{user_prompt}**")
 
-    # Generate SQL and execute query
+    # Generate SQL, execute query, and generate executive summary
     with st.chat_message("assistant"):
-        with st.spinner("🤖 Translating query into Star Schema SQL & executing..."):
+        with st.spinner("🤖 Analyzing data and generating executive insights..."):
             provider_param = "openai" if "OpenAI" in provider else ("gemini" if "Gemini" in provider else "fallback")
             generated_sql = llm_helper.generate_sql(user_prompt, api_key=api_key, provider=provider_param)
 
@@ -318,51 +359,39 @@ if user_prompt:
                 if any(re.search(rf"\b{kw}\b", generated_sql, re.IGNORECASE) for kw in forbidden_keywords):
                     err_text = "🛡️ **Security Alert**: Mutation queries are blocked under Strict Enterprise Mode."
                     st.error(err_text)
-                    st.session_state.messages.append({"role": "assistant", "content": err_text, "sql": generated_sql, "df": None})
+                    st.session_state.messages.append({"role": "assistant", "summary": err_text, "sql": generated_sql, "df": None})
                     st.stop()
 
-            # Display generated SQL in glassmorphic expander
-            with st.expander("🔍 View Executed SQL Query", expanded=True):
-                st.code(generated_sql, language="sql")
-
             try:
-                # Run query against analytical engine
+                # 1. Run SQL query
                 result_df = db_engine.run_query(generated_sql)
 
-                st.markdown(f"**Query Results** (`{len(result_df):,}` rows returned):")
+                # 2. Generate Executive Summary (Plain English)
+                executive_summary = llm_helper.generate_executive_summary(
+                    user_question=user_prompt, 
+                    df=result_df, 
+                    api_key=api_key, 
+                    provider=provider_param
+                )
+
+                # --- TOP-TO-BOTTOM RESPONSE ORDER ---
+                
+                # 1. 💬 Executive Summary (Plain English) at the top
+                st.markdown("### 💬 Executive Summary")
+                st.markdown(executive_summary)
+
+                # 2. 📊 Visual Chart (Plotly) if numeric data is present
+                render_plotly_chart(result_df)
+
+                # 3. 📋 Data Table (st.dataframe)
+                st.markdown(f"**Detailed Data Records** (`{len(result_df):,}` rows returned):")
                 st.dataframe(result_df, use_container_width=True)
 
-                # Automatic Plotly Chart Generation
-                numeric_cols = list(result_df.select_dtypes(include=[np.number]).columns)
-                text_cols = list(result_df.select_dtypes(exclude=[np.number]).columns)
+                # 4. 🔍 Technical Details (Glassmorphic Expander)
+                with st.expander("🔍 Technical Details (SQL Query)", expanded=False):
+                    st.code(generated_sql, language="sql")
 
-                if len(text_cols) >= 1 and len(numeric_cols) >= 1 and 1 < len(result_df) <= 30:
-                    try:
-                        import plotly.express as px
-                        x_col = text_cols[0]
-                        y_col = numeric_cols[0]
-                        
-                        fig = px.bar(
-                            result_df, 
-                            x=x_col, 
-                            y=y_col, 
-                            title=f"{y_col.replace('_', ' ').title()} by {x_col.replace('_', ' ').title()}",
-                            template="plotly_dark",
-                            color=y_col,
-                            color_continuous_scale=["#11998e", "#38ef7d", "#00f2fe", "#f59e0b"]
-                        )
-                        fig.update_layout(
-                            paper_bgcolor="rgba(22, 27, 34, 0.75)",
-                            plot_bgcolor="rgba(0, 0, 0, 0)",
-                            margin=dict(l=20, r=20, t=40, b=20),
-                            height=390,
-                            font=dict(color="#e6edf3")
-                        )
-                        st.plotly_chart(fig, use_container_width=True)
-                    except Exception:
-                        pass
-
-                # Export to CSV button
+                # 5. 📥 Export to CSV button
                 csv_bytes = result_df.to_csv(index=False).encode("utf-8")
                 st.download_button(
                     label="📥 Export Result to CSV",
@@ -371,9 +400,10 @@ if user_prompt:
                     mime="text/csv"
                 )
 
+                # Save to session history
                 st.session_state.messages.append({
                     "role": "assistant",
-                    "content": f"Query executed successfully for: *\"{user_prompt}\"*",
+                    "summary": executive_summary,
                     "sql": generated_sql,
                     "df": result_df
                 })
@@ -381,9 +411,11 @@ if user_prompt:
             except Exception as e:
                 error_msg = f"❌ SQL Execution Error: {e}"
                 st.error(error_msg)
+                with st.expander("🔍 Technical Details (SQL Query)", expanded=True):
+                    st.code(generated_sql, language="sql")
                 st.session_state.messages.append({
                     "role": "assistant",
-                    "content": error_msg,
+                    "summary": error_msg,
                     "sql": generated_sql,
                     "df": None
                 })
