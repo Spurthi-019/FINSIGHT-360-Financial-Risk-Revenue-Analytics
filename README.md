@@ -1,66 +1,79 @@
-# 💳 FINsight 360 – Enterprise Financial Risk & Revenue Analytics
+# 💳 FINSIGHT 360 – Enterprise Financial Risk & Revenue Analytics
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://finsight-360-financial-risk-revenue-analytics.streamlit.app/)
-[![Power BI](https://img.shields.io/badge/Power_BI-Desktop-F2C811?logo=powerbi&logoColor=black)](https://powerbi.microsoft.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Power BI Dashboard](https://img.shields.io/badge/Power_BI-Dashboard_Report-F2C811?logo=powerbi&logoColor=black)](./FINSIGHT%20360.pbix)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![DAX](https://img.shields.io/badge/DAX-Measures-005BA1)](https://learn.microsoft.com/en-us/dax/)
-[![SQL](https://img.shields.io/badge/SQL-Analytics-CC292B)](https://www.postgresql.org/docs/)
+[![Database](https://img.shields.io/badge/Data_Model-Star_Schema-336791?logo=postgresql&logoColor=white)](./data/schema.sql)
+[![DAX](https://img.shields.io/badge/DAX-Measures_Library-005BA1)](./powerbi/dax_measures.dax)
 
-> **FINsight 360** is an end-to-end, enterprise-grade financial analytics and fraud intelligence platform. It ingests 300,000+ multi-channel transaction records into an optimized PostgreSQL Star Schema, executes advanced statistical hypothesis testing, delivers an executive Power BI intelligence suite, and provides a dark-mode Streamlit AI Copilot identifying **₹84.27M in revenue at risk** and **₹25.42M in recoverable GMV**.
+> **FINsight 360** is an end-to-end, enterprise-grade financial analytics and fraud intelligence platform. It ingests 300,000+ multi-channel transaction records into an optimized Star Schema, executes statistical hypothesis testing, delivers a 6-page Power BI executive intelligence suite, and provides a dark-mode Streamlit AI Copilot identifying **₹84.27M in revenue at risk** and **₹25.42M in recoverable GMV**.
 
 ---
 
-## 🌟 Core Live Deliverables
+## 🚀 Live Deliverables & Interactive Demos
 
-| Deliverable | Access Link | Description |
+| Deliverable | Technology Stack | Access / Download Link |
 | :--- | :--- | :--- |
-| 🤖 **Live Streamlit AI Analyst Copilot** | [**Launch Live Copilot Web App**](https://finsight-360-financial-risk-revenue-analytics.streamlit.app/) | Text-to-SQL copilot with executive plain-language summaries, Plotly visual charts, and Star Schema visualizer. |
-| 📊 **Power BI Interactive Dashboard** | [**📥 Download FINSIGHT 360 Power BI Dashboard (14.1 MB)**](./FINSIGHT%20360.pbix) | Complete 6-page production `.pbix` desktop report with custom DAX measures and dimensional model. |
+| **Streamlit AI Analyst Copilot** | Python 3.11, Gemini/OpenAI API, DuckDB, Plotly | [🚀 Launch Web App](https://finsight-360-financial-risk-revenue-analytics.streamlit.app/) |
+| **Power BI Interactive Report** | Power BI Desktop, DAX, Data Modeling | [📥 Download .pbix File](./FINSIGHT%20360.pbix) |
+| **Star Schema DDL & SQL Engine** | SQL, PostgreSQL / DuckDB DDL | [🗄️ View Schema Script](./data/schema.sql) |
 
 ---
 
-## 📥 Power BI Report Download
-
-Download the complete interactive Power BI Desktop report (`FINSIGHT 360.pbix`, 14.1 MB) directly from this repository:
-
-👉 **[📥 Download FINSIGHT 360 Power BI Dashboard](./FINSIGHT%20360.pbix)**
-
-*To view and interact with the data model, KPIs, and dashboards, open this file in [Microsoft Power BI Desktop](https://powerbi.microsoft.com/desktop/).*
-
----
-
-## 🤖 Streamlit AI Financial Analyst Copilot
-
-The repository includes a production-ready, dark-mode glassmorphic AI Analyst Copilot deployed live at **[finsight-360-financial-risk-revenue-analytics.streamlit.app](https://finsight-360-financial-risk-revenue-analytics.streamlit.app/)**.
-
-### Copilot Features & Architecture:
-- 💬 **Executive Plain-English Summaries**: Automatically synthesizes complex query results into 2–4 actionable bullet points for C-suite and VP stakeholders without technical jargon.
-- 🧠 **Autonomous Natural Language to SQL**: Translates user questions into validated standard SQL matching the 5-table Star Schema. Supports OpenAI GPT-4o, Google Gemini 2.0 Flash, and zero-config semantic offline heuristics.
-- 📊 **Dynamic Plotly Visualizations**: Automatically generates interactive dark-themed charts for metric aggregations, merchant loss distributions, and gateway failure rates.
-- 📋 **Detailed Data Tables**: Rendered directly in `st.dataframe` with CSV export capabilities.
-- 🔍 **Glassmorphic SQL Expander**: Expandable technical inspector allowing data engineers to review generated SQL queries and execution logic.
-- 🏛️ **Star Schema Visualizer**: Sidebar metadata explorer displaying active table row counts, column data types, and instant sample previews.
-- 🔒 **Strict Enterprise Mode**: Read-only query security guard blocking mutation keywords (`DROP`, `DELETE`, `UPDATE`, `INSERT`).
-
----
-
-## 🔍 Executive Summary & Core Financial Findings
+## 🔍 Core Financial Audit Findings
 
 | Metric | Measured Value | Business Impact |
 | :--- | :---: | :--- |
-| **Total Gross Merchandise Value (GMV)** | **₹720.91M** (300,113 Txns) | Macro processing volume across all channels & gateways. |
-| **Successful Settlement Volume** | **₹625.40M** (86.64%) | Baseline clean transaction processing conversion. |
-| **Total Revenue at Risk (Failed)** | **₹84.27M** (35,232 Txns) | Total financial leakage across infrastructure & customer declines. |
+| **Total Gross Merchandise Value (GMV)** | **₹720.91M** (300,113 Txns) | Macro processing volume across all payment channels and acquirer gateways. |
+| **Successful Settlement Volume** | **₹625.40M** (86.64%) | Baseline clean transaction processing conversion rate. |
+| **Total Revenue at Risk (Failed)** | **₹84.27M** (35,232 Txns) | Total financial leakage across infrastructure timeouts and customer declines. |
 | **Recoverable Baseline GMV** | **₹25.42M** (10,607 Txns) | **~30.2% of failed volume** addressable via dynamic multi-gateway failover routing. |
-| **High-Value Account Exposure** | **1,735 Customers** (₹82.41M Spend) | High-spend accounts (> ₹25k spend) facing severe failure rates ($\ge 20\%$). |
+| **High-Value Account Exposure** | **1,735 Customers** (₹82.41M Spend) | High-spend accounts (> ₹25,000 spend) experiencing elevated failure rates ($\ge 20\%$). |
 | **Off-Hours Fraud Surge** | **4.2x Escalation** (12 AM - 5 AM IST) | Heightened post-auth fraud frequency on transactions exceeding ₹5,000. |
 
 ---
 
-## 🏛️ Architecture & Data Modeling (Star Schema)
+## 🤖 AI Analyst Copilot (Streamlit App)
 
-The underlying PostgreSQL database implements a normalized Star Schema designed for high-performance OLAP analytical querying:
+The repository includes a production-ready, dark-mode glassmorphic AI Copilot deployed live at **[finsight-360-financial-risk-revenue-analytics.streamlit.app](https://finsight-360-financial-risk-revenue-analytics.streamlit.app/)**.
+
+* **💬 Executive Plain-English Summaries**: Automatically synthesizes complex analytical query results into 2–4 concise, actionable bullet points tailored for C-suite and VP stakeholders without technical SQL jargon.
+* **🧠 Autonomous Natural Language to SQL**: Converts natural language prompts into validated SQL queries against the 5-table Star Schema. Integrates OpenAI GPT-4o, Google Gemini 2.0 Flash, and zero-config offline heuristics.
+* **📊 Dynamic Plotly Visualizations**: Generates dark-themed interactive charts for volume aggregations, merchant loss distributions, and gateway failure rates.
+* **📋 Detailed Data Tables & Export**: Interactive data inspection with one-click CSV export functionality.
+* **🔍 Glassmorphic Technical Inspector**: Expandable SQL inspection container for data engineers and analytics teams.
+* **🏛️ Star Schema Visualizer**: Sidebar metadata explorer displaying active table record counts, column types, and sample data previews.
+* **🔒 Strict Enterprise Mode**: Read-only query security guard blocking mutation operations (`DROP`, `DELETE`, `UPDATE`, `INSERT`).
+
+---
+
+## 📊 Power BI 6-Page Executive Suite
+
+The complete interactive Power BI model [`FINSIGHT 360.pbix`](./FINSIGHT%20360.pbix) (14.1 MB) delivers six dedicated analytics pages:
+
+* **Page 1: Executive Performance Overview** — Macro financial KPIs, GMV trajectory, payment channel conversion waterfall, and global success/failure distributions.
+<br><img width="673" height="380" alt="Executive Performance Overview" src="https://github.com/user-attachments/assets/2d0c2389-7c7f-419e-8be3-24a7fef85dda" />
+
+* **Page 2: Payment Performance & Gateway Reliability** — SLA benchmarking across Razorpay, PayU, Cashfree, HDFC Direct, and Paytm Gateway with acquirer timeout root-cause drill-downs.
+<br><img width="676" height="385" alt="Payment Performance and Gateway Reliability" src="https://github.com/user-attachments/assets/39566df6-0c2e-4df3-b579-0c1485b4eb86" />
+
+* **Page 3: Fraud & Risk Analytics** — Clustering by risk scores, cross-border exposure, and nocturnal fraud spikes (4.2x surge between 12 AM and 5 AM IST).
+<br><img width="678" height="383" alt="Fraud and Risk Analytics" src="https://github.com/user-attachments/assets/de886f80-22a0-4216-829d-cfa0035640cf" />
+
+* **Page 4: Customer Intelligence & Segment Dynamics** — High-Value at-risk customer churn matrix, credit score band analysis, and KYC tier friction points.
+<br><img width="677" height="383" alt="Customer Intelligence and Segment Dynamics" src="https://github.com/user-attachments/assets/c4a4bdb5-267b-4247-8e74-a4cef52662ee" />
+
+* **Page 5: Revenue Risk & Pareto Concentration** — 80/20 loss distribution across 8,000 enterprise merchants and recoverable revenue opportunity via smart failover routing.
+<br><img width="680" height="388" alt="Revenue Risk and Pareto Concentration" src="https://github.com/user-attachments/assets/57e478d8-d7d5-44a3-8bf6-0596aee7ac15" />
+
+* **Page 6: Executive Recommendations & Strategic Roadmap** — Prescriptive action plan, dynamic routing ROI models, and automated risk throttling workflows.
+<br><img width="679" height="383" alt="Executive Recommendations and Strategic Roadmap" src="https://github.com/user-attachments/assets/1239483e-ef5e-4688-be76-30957d7d29b4" />
+
+---
+
+## 🏗️ Architecture & Data Modeling
+
+The underlying database implements a normalized Star Schema designed for high-performance OLAP analytical querying:
 
 ```
                   +-----------------------------------+
@@ -115,45 +128,9 @@ The underlying PostgreSQL database implements a normalized Star Schema designed 
 
 ---
 
-## 📊 6-Page Interactive Power BI Report Structure
+## 📐 Key DAX Measures & Logic
 
-The Power BI model [`FINSIGHT 360.pbix`](./FINSIGHT%20360.pbix) comprises 6 executive views:
-
-### Page 1: Executive Performance Overview
-*Macro Financial KPIs, GMV trajectory, channel conversion waterfall, and global success/failure metrics.*
-<img width="673" height="380" alt="Screenshot 2026-09-07 151257" src="https://github.com/user-attachments/assets/2d0c2389-7c7f-419e-8be3-24a7fef85dda" />
-
-
-### Page 2: Payment Performance & Gateway Reliability
-*SLA benchmarking across Razorpay, PayU, Cashfree, HDFC Direct, and Paytm Gateway with timeout drill-downs.*
-<img width="676" height="385" alt="Screenshot 2026-09-07 151318" src="https://github.com/user-attachments/assets/39566df6-0c2e-4df3-b579-0c1485b4eb86" />
-
-
-### Page 3: Fraud & Risk Analytics
-*Clustering by risk scores, cross-border exposure, and time-of-day fraud spikes (12 AM - 5 AM nocturnal surge).*
-<img width="678" height="383" alt="Screenshot 2026-09-07 151330" src="https://github.com/user-attachments/assets/de886f80-22a0-4216-829d-cfa0035640cf" />
-
-
-### Page 4: Customer Intelligence & Segment Dynamics
-*High-Value at-risk customer churn matrix, credit score band analysis, and KYC friction points.*
-<img width="677" height="383" alt="Screenshot 2026-09-07 151342" src="https://github.com/user-attachments/assets/c4a4bdb5-267b-4247-8e74-a4cef52662ee" />
-
-
-### Page 5: Revenue Risk & Pareto Concentration
-*80/20 loss distribution across 8,000 merchants and recoverable revenue opportunity via failover routing.*
-<img width="680" height="388" alt="Screenshot 2026-09-07 151354" src="https://github.com/user-attachments/assets/57e478d8-d7d5-44a3-8bf6-0596aee7ac15" />
-
-
-### Page 6: Executive Recommendations & Strategic Roadmap
-*Prescriptive action plan, dynamic routing ROI model, and automated risk throttling workflows.*
-<img width="679" height="383" alt="Screenshot 2026-09-07 151404" src="https://github.com/user-attachments/assets/1239483e-ef5e-4688-be76-30957d7d29b4" />
-
-
----
-
-## 📐 Key DAX Measures
-
-The data model features a modular DAX measure library in [`dax/`](./dax/) and [`powerbi/dax_measures.dax`](./powerbi/dax_measures.dax):
+The data model features an enterprise DAX measure library in [`dax/`](./dax/) and [`powerbi/dax_measures.dax`](./powerbi/dax_measures.dax):
 
 ```dax
 /// Revenue at Risk from Failed Transactions
@@ -201,50 +178,6 @@ CALCULATE(
 
 ---
 
-## 🚀 Quickstart & Setup Guide
-
-### 1. Clone the Repository
-```bash
-git clone https://github.com/Spurthi-019/FINSIGHT-360-Financial-Risk-Revenue-Analytics.git
-cd FINSIGHT-360-Financial-Risk-Revenue-Analytics
-```
-
-### 2. Set Up Python Environment & Run Streamlit App
-```bash
-python -m venv venv
-# Windows:
-venv\Scripts\activate
-# Linux/macOS:
-source venv/bin/activate
-
-pip install -r requirements.txt
-
-# Run the AI Analyst Copilot:
-streamlit run app/app.py
-```
-
-### 3. Build Star Schema & Ingest into PostgreSQL
-```bash
-# 1. Transform raw data into normalized star schema CSVs:
-python python/build_star_schema.py
-
-# 2. Ingest into local PostgreSQL instance (finsight360 database):
-python python/ingest_to_postgres.py
-
-# 3. Execute production analytics and export CSV reports:
-python python/run_sql_analytics.py
-
-# 4. Run statistical hypothesis validation (Z-Test & Chi-Square):
-python python/statistical_validation.py
-```
-
-### 4. Open the Power BI Dashboard
-1. Open Microsoft Power BI Desktop.
-2. Click **File** $\rightarrow$ **Open** $\rightarrow$ select [`FINSIGHT 360.pbix`](./FINSIGHT%20360.pbix).
-3. Update database credentials under **Transform Data** $\rightarrow$ **Data source settings** to point to your PostgreSQL instance.
-
----
-
 ## 📂 Repository Structure
 
 ```
@@ -253,12 +186,12 @@ FINSIGHT-360-Financial-Risk-Revenue-Analytics/
 ├── .streamlit/
 │   └── config.toml                             <-- (Dark Theme Glassmorphic Configuration)
 ├── .gitignore
-├── requirements.txt                            <-- (Deployment Dependencies)
+├── requirements.txt                            <-- (Root Dependencies for Streamlit Cloud)
 ├── README.md
 ├── FINSIGHT 360.pbix                           <-- (Power BI Desktop Report - 14.1 MB)
 │
 ├── app/
-│   ├── app.py                                  <-- (Streamlit Copilot Interface)
+│   ├── app.py                                  <-- (Streamlit AI Copilot Interface)
 │   ├── db_engine.py                            <-- (DuckDB & SQLite Analytical Engine)
 │   ├── llm_helper.py                           <-- (Text-to-SQL & Executive Summary Generator)
 │   ├── requirements.txt                        <-- (App-level Dependencies)
@@ -297,8 +230,52 @@ FINSIGHT-360-Financial-Risk-Revenue-Analytics/
 
 ---
 
+## ⚡ Quickstart & Setup Guide
+
+* **Step 1: Clone Repository**
+  ```bash
+  git clone https://github.com/Spurthi-019/FINSIGHT-360-Financial-Risk-Revenue-Analytics.git
+  cd FINSIGHT-360-Financial-Risk-Revenue-Analytics
+  ```
+
+* **Step 2: Environment Setup & Local Streamlit Launch**
+  ```bash
+  python -m venv venv
+  # Windows:
+  venv\Scripts\activate
+  # Linux/macOS:
+  source venv/bin/activate
+
+  pip install -r requirements.txt
+
+  # Launch the Streamlit AI Analyst Copilot:
+  streamlit run app/app.py
+  ```
+
+* **Step 3: Star Schema Build & Database Ingestion**
+  ```bash
+  # Transform raw data into normalized star schema CSVs:
+  python python/build_star_schema.py
+
+  # Ingest into local PostgreSQL instance (finsight360 database):
+  python python/ingest_to_postgres.py
+
+  # Execute SQL analytics and export query results:
+  python python/run_sql_analytics.py
+
+  # Run hypothesis testing (Two-Proportion Z-Test & Chi-Square):
+  python python/statistical_validation.py
+  ```
+
+* **Step 4: Power BI Report Access**
+  1. Open Microsoft Power BI Desktop.
+  2. Click **File** $\rightarrow$ **Open** $\rightarrow$ select [`FINSIGHT 360.pbix`](./FINSIGHT%20360.pbix).
+  3. *(Optional)* Update database connection under **Transform Data** $\rightarrow$ **Data source settings** to point to your live PostgreSQL database.
+
+---
+
 ## 👨‍💻 Author & Attribution
-- **Author**: Spurthi ([@Spurthi-019](https://github.com/Spurthi-019))
-- **Project**: FINsight 360 – Enterprise Financial Risk & Revenue Analytics
-- **Live Streamlit Copilot**: [FINsight 360 Web App](https://finsight-360-financial-risk-revenue-analytics.streamlit.app/)
-- **Repository**: [FINSIGHT-360-Financial-Risk-Revenue-Analytics](https://github.com/Spurthi-019/FINSIGHT-360-Financial-Risk-Revenue-Analytics)
+* **Author**: Spurthi ([@Spurthi-019](https://github.com/Spurthi-019))
+* **Project**: FINsight 360 – Enterprise Financial Risk & Revenue Analytics
+* **Live Streamlit Copilot**: [FINsight 360 Web App](https://finsight-360-financial-risk-revenue-analytics.streamlit.app/)
+* **Repository**: [FINSIGHT-360-Financial-Risk-Revenue-Analytics](https://github.com/Spurthi-019/FINSIGHT-360-Financial-Risk-Revenue-Analytics)
