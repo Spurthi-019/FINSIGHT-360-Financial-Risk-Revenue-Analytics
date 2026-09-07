@@ -1,12 +1,22 @@
 # 💳 FINsight 360 – Enterprise Financial Risk & Revenue Analytics
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://finsight-360-financial-risk-revenue-analytics.streamlit.app/)
 [![Power BI](https://img.shields.io/badge/Power_BI-Desktop-F2C811?logo=powerbi&logoColor=black)](https://powerbi.microsoft.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![DAX](https://img.shields.io/badge/DAX-Measures-005BA1)](https://learn.microsoft.com/en-us/dax/)
 [![SQL](https://img.shields.io/badge/SQL-Analytics-CC292B)](https://www.postgresql.org/docs/)
 
-> **FINsight 360** is an end-to-end, enterprise-grade financial analytics and fraud intelligence platform. It ingests 300,000+ multi-channel transaction records into an optimized PostgreSQL Star Schema, executes advanced statistical hypothesis testing, and delivers an executive Power BI intelligence suite identifying **₹84.27M in revenue at risk** and **₹25.42M in recoverable GMV**.
+> **FINsight 360** is an end-to-end, enterprise-grade financial analytics and fraud intelligence platform. It ingests 300,000+ multi-channel transaction records into an optimized PostgreSQL Star Schema, executes advanced statistical hypothesis testing, delivers an executive Power BI intelligence suite, and provides a dark-mode Streamlit AI Copilot identifying **₹84.27M in revenue at risk** and **₹25.42M in recoverable GMV**.
+
+---
+
+## 🌟 Core Live Deliverables
+
+| Deliverable | Access Link | Description |
+| :--- | :--- | :--- |
+| 🤖 **Live Streamlit AI Analyst Copilot** | [**Launch Live Copilot Web App**](https://finsight-360-financial-risk-revenue-analytics.streamlit.app/) | Text-to-SQL copilot with executive plain-language summaries, Plotly visual charts, and Star Schema visualizer. |
+| 📊 **Power BI Interactive Dashboard** | [**📥 Download FINSIGHT 360 Power BI Dashboard (14.1 MB)**](./FINSIGHT%20360.pbix) | Complete 6-page production `.pbix` desktop report with custom DAX measures and dimensional model. |
 
 ---
 
@@ -17,6 +27,21 @@ Download the complete interactive Power BI Desktop report (`FINSIGHT 360.pbix`, 
 👉 **[📥 Download FINSIGHT 360 Power BI Dashboard](./FINSIGHT%20360.pbix)**
 
 *To view and interact with the data model, KPIs, and dashboards, open this file in [Microsoft Power BI Desktop](https://powerbi.microsoft.com/desktop/).*
+
+---
+
+## 🤖 Phase 6: Streamlit AI Financial Analyst Copilot
+
+The repository includes a production-ready, dark-mode glassmorphic AI Analyst Copilot deployed live at **[finsight-360-financial-risk-revenue-analytics.streamlit.app](https://finsight-360-financial-risk-revenue-analytics.streamlit.app/)**.
+
+### Copilot Features & Architecture:
+- 💬 **Executive Plain-English Summaries**: Automatically synthesizes complex query results into 2–4 actionable bullet points for C-suite and VP stakeholders without technical jargon.
+- 🧠 **Autonomous Natural Language to SQL**: Translates user questions into validated standard SQL matching the 5-table Star Schema. Supports OpenAI GPT-4o, Google Gemini 2.0 Flash, and zero-config semantic offline heuristics.
+- 📊 **Dynamic Plotly Visualizations**: Automatically generates interactive dark-themed charts for metric aggregations, merchant loss distributions, and gateway failure rates.
+- 📋 **Detailed Data Tables**: Rendered directly in `st.dataframe` with CSV export capabilities.
+- 🔍 **Glassmorphic SQL Expander**: Expandable technical inspector allowing data engineers to review generated SQL queries and execution logic.
+- 🏛️ **Star Schema Visualizer**: Sidebar metadata explorer displaying active table row counts, column data types, and instant sample previews.
+- 🔒 **Strict Enterprise Mode**: Read-only query security guard blocking mutation keywords (`DROP`, `DELETE`, `UPDATE`, `INSERT`).
 
 ---
 
@@ -184,7 +209,7 @@ git clone https://github.com/Spurthi-019/FINSIGHT-360-Financial-Risk-Revenue-Ana
 cd FINSIGHT-360-Financial-Risk-Revenue-Analytics
 ```
 
-### 2. Set Up Python Environment
+### 2. Set Up Python Environment & Run Streamlit App
 ```bash
 python -m venv venv
 # Windows:
@@ -192,7 +217,10 @@ venv\Scripts\activate
 # Linux/macOS:
 source venv/bin/activate
 
-pip install pandas numpy psycopg2-binary sqlalchemy scipy
+pip install -r requirements.txt
+
+# Run the AI Analyst Copilot:
+streamlit run app/app.py
 ```
 
 ### 3. Build Star Schema & Ingest into PostgreSQL
@@ -222,9 +250,19 @@ python python/statistical_validation.py
 ```
 FINSIGHT-360-Financial-Risk-Revenue-Analytics/
 │
+├── .streamlit/
+│   └── config.toml                             <-- (Dark Theme Glassmorphic Configuration)
 ├── .gitignore
+├── requirements.txt                            <-- (Deployment Dependencies)
 ├── README.md
-├── FINSIGHT 360.pbix                       <-- (Power BI Desktop Report - 14.1 MB)
+├── FINSIGHT 360.pbix                           <-- (Power BI Desktop Report - 14.1 MB)
+│
+├── app/
+│   ├── app.py                                  <-- (Streamlit Copilot Interface)
+│   ├── db_engine.py                            <-- (DuckDB & SQLite Analytical Engine)
+│   ├── llm_helper.py                           <-- (Text-to-SQL & Executive Summary Generator)
+│   ├── requirements.txt                        <-- (App-level Dependencies)
+│   └── .env.example                            <-- (Environment Config Template)
 │
 ├── data/
 │   ├── schema.sql                              <-- (PostgreSQL DDL Star Schema)
@@ -253,11 +291,8 @@ FINSIGHT-360-Financial-Risk-Revenue-Analytics/
 │   ├── statistical_validation_report.txt
 │   └── sql_outputs/                            <-- (Exported Query CSVs)
 │
-├── screenshots/
-│   └── README.md                               <-- (Report Page Previews)
-│
-└── app/
-    └── .gitkeep                                <-- (Phase 6 Streamlit Copilot Placeholder)
+└── screenshots/
+    └── README.md                               <-- (Report Page Previews)
 ```
 
 ---
@@ -265,4 +300,5 @@ FINSIGHT-360-Financial-Risk-Revenue-Analytics/
 ## 👨‍💻 Author & Attribution
 - **Author**: Spurthi ([@Spurthi-019](https://github.com/Spurthi-019))
 - **Project**: FINsight 360 – Enterprise Financial Risk & Revenue Analytics
+- **Live Streamlit Copilot**: [FINsight 360 Web App](https://finsight-360-financial-risk-revenue-analytics.streamlit.app/)
 - **Repository**: [FINSIGHT-360-Financial-Risk-Revenue-Analytics](https://github.com/Spurthi-019/FINSIGHT-360-Financial-Risk-Revenue-Analytics)
