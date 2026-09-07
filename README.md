@@ -12,9 +12,9 @@
 
 ## 📥 Power BI Report Download
 
-Download the complete interactive Power BI Desktop report (`.pbix`) directly from this repository:
+Download the complete interactive Power BI Desktop report (`FINSIGHT 360.pbix`, 14.1 MB) directly from this repository:
 
-👉 **[📥 Download FINSIGHT_360_Financial_Risk_Analytics.pbix](./FINSIGHT_360_Financial_Risk_Analytics.pbix)**
+👉 **[📥 Download FINSIGHT 360 Power BI Dashboard](./FINSIGHT%20360.pbix)**
 
 *To view and interact with the data model, KPIs, and dashboards, open this file in [Microsoft Power BI Desktop](https://powerbi.microsoft.com/desktop/).*
 
@@ -92,7 +92,7 @@ The underlying PostgreSQL database implements a normalized Star Schema designed 
 
 ## 📊 6-Page Interactive Power BI Report Structure
 
-The Power BI model [`FINSIGHT_360_Financial_Risk_Analytics.pbix`](./FINSIGHT_360_Financial_Risk_Analytics.pbix) comprises 6 executive views:
+The Power BI model [`FINSIGHT 360.pbix`](./FINSIGHT%20360.pbix) comprises 6 executive views:
 
 ### Page 1: Executive Performance Overview
 *Macro Financial KPIs, GMV trajectory, channel conversion waterfall, and global success/failure metrics.*
@@ -206,7 +206,7 @@ python python/statistical_validation.py
 
 ### 4. Open the Power BI Dashboard
 1. Open Microsoft Power BI Desktop.
-2. Click **File** $\rightarrow$ **Open** $\rightarrow$ select [`FINSIGHT_360_Financial_Risk_Analytics.pbix`](./FINSIGHT_360_Financial_Risk_Analytics.pbix).
+2. Click **File** $\rightarrow$ **Open** $\rightarrow$ select [`FINSIGHT 360.pbix`](./FINSIGHT%20360.pbix).
 3. Update database credentials under **Transform Data** $\rightarrow$ **Data source settings** to point to your PostgreSQL instance.
 
 ---
@@ -218,7 +218,7 @@ FINSIGHT-360-Financial-Risk-Revenue-Analytics/
 │
 ├── .gitignore
 ├── README.md
-├── FINSIGHT_360_Financial_Risk_Analytics.pbix  <-- (Power BI Desktop Report)
+├── FINSIGHT 360.pbix                       <-- (Power BI Desktop Report - 14.1 MB)
 │
 ├── data/
 │   ├── schema.sql                              <-- (PostgreSQL DDL Star Schema)
