@@ -1,0 +1,53 @@
+// ============================================================================
+// FINsight 360 - DAX Fraud & Risk Analytics Library
+// File: dax/fraud_analytics.dax
+// ============================================================================
+
+Fraud Blocked Volume = 
+CALCULATE(
+    [Total Gross Volume GMV],
+    fact_transactions[transaction_status] = "FRAUD_BLOCKED"
+)
+
+Fraud Blocked Transactions = 
+CALCULATE(
+    [Total Transactions],
+    fact_transactions[transaction_status] = "FRAUD_BLOCKED"
+)
+
+Fraud Rate % = 
+DIVIDE(
+    [Fraud Blocked Transactions],
+    [Total Transactions],
+    0
+)
+
+Off-Hours Fraud Volume = 
+CALCULATE(
+    [Fraud Blocked Volume],
+    HOUR(fact_transactions[transaction_timestamp]) >= 0 && 
+    HOUR(fact_transactions[transaction_timestamp]) <= 5
+)
+
+Off-Hours Fraud Rate % = 
+VAR OffHoursTxns = 
+    CALCULATE(
+        [Total Transactions],
+        HOUR(fact_transactions[transaction_timestamp]) >= 0 && 
+        HOUR(fact_transactions[transaction_timestamp]) <= 5
+    )
+VAR OffHoursFraud = 
+    CALCULATE(
+        [Fraud Blocked Transactions],
+        HOUR(fact_transactions[transaction_timestamp]) >= 0 && 
+        HOUR(fact_transactions[transaction_timestamp]) <= 5
+    )
+RETURN
+DIVIDE(OffHoursFraud, OffHoursTxns, 0)
+
+International Fraud Loss % = 
+DIVIDE(
+    CALCULATE([Fraud Blocked Volume], fact_transactions[is_international] = 1),
+    [Fraud Blocked Volume],
+    0
+)

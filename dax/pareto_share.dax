@@ -1,0 +1,48 @@
+// ============================================================================
+// FINsight 360 - DAX Revenue Pareto & Recoverability Library
+// File: dax/pareto_share.dax
+// ============================================================================
+
+Infrastructure Lost Revenue = 
+CALCULATE(
+    [Total Gross Volume GMV],
+    dim_failure_reasons[failure_category] = "Infrastructure"
+)
+
+Recoverable Baseline GMV = 
+CALCULATE(
+    [Total Gross Volume GMV],
+    dim_failure_reasons[failure_reason_code] IN {"GATEWAY_TIMEOUT", "TECHNICAL_ERROR"}
+)
+
+Infrastructure Loss Share % = 
+DIVIDE(
+    [Infrastructure Lost Revenue],
+    [Revenue at Risk (Failed)],
+    0
+)
+
+Top 20 Merchant Loss Share % = 
+VAR TotalGlobalFailedVolume = 
+    CALCULATE([Revenue at Risk (Failed)], ALL(dim_merchants))
+VAR Top20MerchantsFailedVolume = 
+    CALCULATE(
+        [Revenue at Risk (Failed)],
+        TOPN(
+            20,
+            ALL(dim_merchants[merchant_id]),
+            [Revenue at Risk (Failed)],
+            DESC
+        )
+    )
+RETURN
+DIVIDE(Top20MerchantsFailedVolume, TotalGlobalFailedVolume, 0)
+
+At-Risk Customer Spend = 
+CALCULATE(
+    [Total Gross Volume GMV],
+    FILTER(
+        VALUES(dim_customers[customer_id]),
+        [Failure Rate %] >= 0.20 && [Total Gross Volume GMV] >= 25000
+    )
+)

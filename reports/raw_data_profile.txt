@@ -1,0 +1,125 @@
+================================================================================
+           FINsight 360 - RAW DATASET PROFILE REPORT
+================================================================================
+
+1. FILE INFORMATION
+--------------------------------------------------------------------------------
+File Name      : transactions_train.csv
+Absolute Path  : C:\Users\om\Downloads\FINsight360\data\raw\transactions_train.csv
+File Size      : 43.33 MB (45,434,096 bytes)
+
+Loading dataset with pandas...
+Dataset successfully loaded. Total Rows: 300,113, Total Columns: 21
+
+2. DATASET DIMENSIONS & SCHEMA OVERVIEW
+--------------------------------------------------------------------------------
+Total Row Count    : 300,113
+Total Column Count : 21
+
+No.  Column Name                         Detected dtype    
+------------------------------------------------------------
+1    transaction_id                      int64             
+2    transaction_time                    str               
+3    customer_id                         int64             
+4    merchant_id                         int64             
+5    account_age_days                    int64             
+6    credit_score_band                   int64             
+7    kyc_level                           int64             
+8    avg_monthly_spend                   float64           
+9    merchant_risk_score                 float64           
+10   transaction_amount                  float64           
+11   payment_channel                     str               
+12   device_type                         str               
+13   is_international                    int64             
+14   ip_risk_score                       float64           
+15   txn_count_1h                        int64             
+16   txn_count_24h                       int64             
+17   failed_txn_count_24h                int64             
+18   geo_distance_from_last_txn          float64           
+19   amount_deviation_from_user_mean     float64           
+20   is_fraud                            int64             
+21   post_auth_risk_score                float64           
+
+3. MISSING (NULL) VALUES ANALYSIS
+--------------------------------------------------------------------------------
+Column Name                         Null Count   Null Percentage
+-----------------------------------------------------------------
+transaction_id                      0              0.00%
+transaction_time                    0              0.00%
+customer_id                         0              0.00%
+merchant_id                         0              0.00%
+account_age_days                    0              0.00%
+credit_score_band                   0              0.00%
+kyc_level                           0              0.00%
+avg_monthly_spend                   0              0.00%
+merchant_risk_score                 0              0.00%
+transaction_amount                  0              0.00%
+payment_channel                     0              0.00%
+device_type                         0              0.00%
+is_international                    0              0.00%
+ip_risk_score                       0              0.00%
+txn_count_1h                        0              0.00%
+txn_count_24h                       0              0.00%
+failed_txn_count_24h                0              0.00%
+geo_distance_from_last_txn          0              0.00%
+amount_deviation_from_user_mean     0              0.00%
+is_fraud                            0              0.00%
+post_auth_risk_score                0              0.00%
+
+[Summary] No missing values detected across all columns (100% complete).
+
+4. DUPLICATE ROWS ANALYSIS
+--------------------------------------------------------------------------------
+Total Exact Duplicate Rows : 0 (0.00%)
+
+5. DATE & TIMESTAMP COLUMNS ANALYSIS
+--------------------------------------------------------------------------------
+Column: 'transaction_time' (Original dtype: str)
+  Valid Parsed Timestamps : 300,113 / 300,113
+  Earliest Date (Min)     : 2023-01-01 00:02:00.328105993
+  Latest Date (Max)       : 2023-09-30 23:56:57.561687899
+  Date Range in Days      : 273.00 days (~9.0 months)
+
+6. TEXT & CATEGORICAL COLUMNS ANALYSIS
+--------------------------------------------------------------------------------
+Column: 'payment_channel'
+  Cardinality (Unique Values): 4
+  Top 5 Most Frequent Values :
+    1. 'card'                    Count:  149,765 (49.90%)
+    2. 'upi'                     Count:   75,108 (25.03%)
+    3. 'wallet'                  Count:   45,176 (15.05%)
+    4. 'bank_transfer'           Count:   30,064 (10.02%)
+
+Column: 'device_type'
+  Cardinality (Unique Values): 3
+  Top 5 Most Frequent Values :
+    1. 'mobile'                  Count:  210,051 (69.99%)
+    2. 'desktop'                 Count:   75,080 (25.02%)
+    3. 'tablet'                  Count:   14,982 ( 4.99%)
+
+7. NUMERIC COLUMNS SUMMARY STATISTICS
+--------------------------------------------------------------------------------
+Column Name                         Min            Max            Mean           Median        
+-----------------------------------------------------------------------------------------------
+transaction_id                      1              399,997        200,077.1912   199,977       
+customer_id                         0              39,999         19,981.5837    19,978        
+merchant_id                         0              7,999          3,995.4859     3,997         
+account_age_days                    30             1,999          1,017.1808     1,018         
+credit_score_band                   1              5              3.0030         3             
+kyc_level                           1              3              1.9994         2             
+avg_monthly_spend                   43.8554        32,362.6175    4,985.7396     4,334.6115    
+merchant_risk_score                 0.0014         0.8376         0.2514         0.2296        
+transaction_amount                  4.3115         19,486.9871    2,402.1239     2,017.1801    
+is_international                    0              1              0.0692         0             
+ip_risk_score                       0.0003         0.9641         0.2857         0.2643        
+txn_count_1h                        0              9              1.1003         1             
+txn_count_24h                       0              15             3.2019         3             
+failed_txn_count_24h                0              5              0.3506         0             
+geo_distance_from_last_txn          0.0002         199.1356       34.1805        28.9168       
+amount_deviation_from_user_mean     -778.6035      19,419.0225    2,235.9326     1,853.5818    
+is_fraud                            0              1              0.0162         0             
+post_auth_risk_score                0.0000         0.9999         0.2109         0.2038        
+
+================================================================================
+                     END OF DATASET PROFILE REPORT
+================================================================================

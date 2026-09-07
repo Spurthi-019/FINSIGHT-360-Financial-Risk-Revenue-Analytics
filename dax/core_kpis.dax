@@ -1,0 +1,54 @@
+// ============================================================================
+// FINsight 360 - DAX Core KPIs Library
+// File: dax/core_kpis.dax
+// ============================================================================
+
+Total Gross Volume GMV = 
+SUM(fact_transactions[amount])
+
+Successful Volume = 
+CALCULATE(
+    [Total Gross Volume GMV],
+    fact_transactions[transaction_status] = "SUCCESS"
+)
+
+Revenue at Risk (Failed) = 
+CALCULATE(
+    [Total Gross Volume GMV],
+    fact_transactions[transaction_status] = "FAILED"
+)
+
+Total Transactions = 
+COUNTROWS(fact_transactions)
+
+Successful Transactions = 
+CALCULATE(
+    [Total Transactions],
+    fact_transactions[transaction_status] = "SUCCESS"
+)
+
+Failed Transactions = 
+CALCULATE(
+    [Total Transactions],
+    fact_transactions[transaction_status] = "FAILED"
+)
+
+Success Rate % = 
+DIVIDE(
+    [Successful Transactions],
+    [Total Transactions],
+    0
+)
+
+Failure Rate % = 
+DIVIDE(
+    [Failed Transactions],
+    [Total Transactions],
+    0
+)
+
+Average Ticket Size = 
+AVERAGE(fact_transactions[amount])
+
+Average Risk Score = 
+AVERAGE(fact_transactions[risk_score])

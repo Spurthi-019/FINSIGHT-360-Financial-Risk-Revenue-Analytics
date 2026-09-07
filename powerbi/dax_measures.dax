@@ -1,0 +1,398 @@
+// ============================================================================
+// FINsight 360 - Enterprise Power BI DAX Measure Library
+// File: powerbi/dax_measures.dax
+// Model: PostgreSQL Star Schema (fact_transactions + 4 Dimension Tables)
+// ============================================================================
+
+/*
+-------------------------------------------------------------------------------
+TABLE OF CONTENTS:
+1. Core Financial & Volume KPIs
+2. Revenue Leakage & Infrastructure Drill-Down
+3. Anomaly Specific & Statistical Diagnostic Metrics
+4. Customer Churn & High-Value Risk Metrics
+5. Merchant Performance & Pareto Concentration
+6. Gateway SLA & Operational Reliability Metrics
+-------------------------------------------------------------------------------
+*/
+
+
+// ============================================================================
+// SECTION 1: CORE FINANCIAL & VOLUME KPIs
+// ============================================================================
+
+/// <summary>
+/// Total Gross Merchandise Value (GMV) across all attempted transactions.
+/// </summary>
+Total Gross Volume GMV = 
+SUM(fact_transactions[amount])
+
+/// <summary>
+/// Total volume of successfully settled transactions.
+/// </summary>
+Successful Volume = 
+CALCULATE(
+    [Total Gross Volume GMV],
+    fact_transactions[transaction_status] = "SUCCESS"
+)
+
+/// <summary>
+/// Revenue at risk: Total transaction volume lost to operational/technical failures.
+/// </summary>
+Revenue at Risk (Failed) = 
+CALCULATE(
+    [Total Gross Volume GMV],
+    fact_transactions[transaction_status] = "FAILED"
+)
+
+/// <summary>
+/// Total volume blocked by pre/post-auth fraud risk engines.
+/// </summary>
+Fraud Blocked Volume = 
+CALCULATE(
+    [Total Gross Volume GMV],
+    fact_transactions[transaction_status] = "FRAUD_BLOCKED"
+)
+
+/// <summary>
+/// Total count of all transaction attempts.
+/// </summary>
+Total Transactions = 
+COUNTROWS(fact_transactions)
+
+/// <summary>
+/// Total count of successfully completed transactions.
+/// </summary>
+Successful Transactions = 
+CALCULATE(
+    [Total Transactions],
+    fact_transactions[transaction_status] = "SUCCESS"
+)
+
+/// <summary>
+/// Total count of failed transactions.
+/// </summary>
+Failed Transactions = 
+CALCULATE(
+    [Total Transactions],
+    fact_transactions[transaction_status] = "FAILED"
+)
+
+/// <summary>
+/// Total count of transactions flagged and blocked as fraudulent.
+/// </summary>
+Fraud Blocked Transactions = 
+CALCULATE(
+    [Total Transactions],
+    fact_transactions[transaction_status] = "FRAUD_BLOCKED"
+)
+
+/// <summary>
+/// Percentage conversion rate of attempted transactions that succeeded.
+/// </summary>
+Success Rate % = 
+DIVIDE(
+    [Successful Transactions],
+    [Total Transactions],
+    0
+)
+
+/// <summary>
+/// Percentage rate of transactions that failed due to technical/customer reasons.
+/// </summary>
+Failure Rate % = 
+DIVIDE(
+    [Failed Transactions],
+    [Total Transactions],
+    0
+)
+
+/// <summary>
+/// Percentage rate of transactions identified as fraud.
+/// </summary>
+Fraud Rate % = 
+DIVIDE(
+    [Fraud Blocked Transactions],
+    [Total Transactions],
+    0
+)
+
+/// <summary>
+/// Average transaction amount (ticket size) across all attempts.
+/// </summary>
+Average Ticket Size = 
+AVERAGE(fact_transactions[amount])
+
+/// <summary>
+/// Mean post-authorization risk score (0.0 to 100.0 scale).
+/// </summary>
+Average Risk Score = 
+AVERAGE(fact_transactions[risk_score])
+
+
+
+// ============================================================================
+// SECTION 2: REVENUE LEAKAGE & INFRASTRUCTURE DRILL-DOWN
+// ============================================================================
+
+/// <summary>
+/// Total lost transaction revenue caused by Infrastructure faults (Gateway timeouts, Switch errors).
+/// </summary>
+Infrastructure Lost Revenue = 
+CALCULATE(
+    [Total Gross Volume GMV],
+    dim_failure_reasons[failure_category] = "Infrastructure"
+)
+
+/// <summary>
+/// Total lost transaction revenue caused by Customer-Side issues (Insufficient balance, Bank declines).
+/// </summary>
+Customer Side Lost Revenue = 
+CALCULATE(
+    [Total Gross Volume GMV],
+    dim_failure_reasons[failure_category] = "Customer Side"
+)
+
+/// <summary>
+/// Total lost transaction revenue caused by Risk & Compliance blocks (Auth failure, Fraud rule trigger).
+/// </summary>
+Risk & Compliance Lost Revenue = 
+CALCULATE(
+    [Total Gross Volume GMV],
+    dim_failure_reasons[failure_category] = "Risk & Compliance"
+)
+
+/// <summary>
+/// Specific volume loss attributed strictly to Acquirer Latency Timeouts (Code: GATEWAY_TIMEOUT).
+/// </summary>
+Gateway Timeout Lost Volume = 
+CALCULATE(
+    [Total Gross Volume GMV],
+    dim_failure_reasons[failure_reason_code] = "GATEWAY_TIMEOUT"
+)
+
+/// <summary>
+/// Specific volume loss attributed strictly to Technical Exceptions (Code: TECHNICAL_ERROR).
+/// </summary>
+Technical Error Lost Volume = 
+CALCULATE(
+    [Total Gross Volume GMV],
+    dim_failure_reasons[failure_reason_code] = "TECHNICAL_ERROR"
+)
+
+/// <summary>
+/// Specific volume loss attributed to Issuing Bank Declines (Code: BANK_DECLINED).
+/// </summary>
+Bank Declined Lost Volume = 
+CALCULATE(
+    [Total Gross Volume GMV],
+    dim_failure_reasons[failure_reason_code] = "BANK_DECLINED"
+)
+
+/// <summary>
+/// Specific volume loss attributed to Insufficient Account Balance (Code: INSUFFICIENT_FUNDS).
+/// </summary>
+Insufficient Funds Lost Volume = 
+CALCULATE(
+    [Total Gross Volume GMV],
+    dim_failure_reasons[failure_reason_code] = "INSUFFICIENT_FUNDS"
+)
+
+/// <summary>
+/// Share of total revenue leakage contributed by Infrastructure failures.
+/// </summary>
+Infrastructure Loss Share % = 
+DIVIDE(
+    [Infrastructure Lost Revenue],
+    [Revenue at Risk (Failed)] + [Fraud Blocked Volume],
+    0
+)
+
+
+
+// ============================================================================
+// SECTION 3: ANOMALY SPECIFIC & STATISTICAL DIAGNOSTIC METRICS
+// ============================================================================
+
+/// <summary>
+/// Failure rate specifically targeting Tier-2 Cities during evening peak hours (18:00 - 22:59) on UPI.
+/// </summary>
+July Peak UPI Tier2 Fail Rate % = 
+CALCULATE(
+    [Failure Rate %],
+    dim_customers[city] = "Tier-2 Cities",
+    dim_payment_methods[payment_method_code] = "upi",
+    fact_transactions[is_fraud] = 0
+)
+
+/// <summary>
+/// Total volume attempted during July peak UPI window in Tier-2 Cities.
+/// </summary>
+July Peak UPI Tier2 Total Volume = 
+CALCULATE(
+    [Total Gross Volume GMV],
+    dim_customers[city] = "Tier-2 Cities",
+    dim_payment_methods[payment_method_code] = "upi",
+    fact_transactions[is_fraud] = 0
+)
+
+/// <summary>
+/// Lost revenue due to Gateway Timeouts in the July peak UPI Tier-2 window.
+/// </summary>
+July Peak UPI Tier2 Timeout Lost Volume = 
+CALCULATE(
+    [Gateway Timeout Lost Volume],
+    dim_customers[city] = "Tier-2 Cities",
+    dim_payment_methods[payment_method_code] = "upi",
+    fact_transactions[is_fraud] = 0
+)
+
+/// <summary>
+/// Overall baseline non-fraud failure rate across all standard transactions.
+/// </summary>
+Baseline Non-Fraud Failure Rate % = 
+CALCULATE(
+    [Failure Rate %],
+    fact_transactions[is_fraud] = 0
+)
+
+/// <summary>
+/// Absolute Risk Increase (percentage point delta) of Peak Window over Baseline.
+/// </summary>
+Peak vs Baseline Failure Rate Delta % = 
+[July Peak UPI Tier2 Fail Rate %] - [Baseline Non-Fraud Failure Rate %]
+
+
+
+// ============================================================================
+// SECTION 4: CUSTOMER CHURN & HIGH-VALUE RISK METRICS
+// ============================================================================
+
+/// <summary>
+/// Total count of distinct registered customers.
+/// </summary>
+Total Customers = 
+DISTINCTCOUNT(dim_customers[customer_id])
+
+/// <summary>
+/// Count of high-value customers with cumulative spend exceeding ₹25,000.
+/// </summary>
+High-Spend Customers Count = 
+COUNTROWS(
+    FILTER(
+        VALUES(dim_customers[customer_id]),
+        [Total Gross Volume GMV] >= 25000
+    )
+)
+
+/// <summary>
+/// Count of High-Value At-Risk customers experiencing >= 20% failure rates.
+/// </summary>
+At-Risk High-Value Customers Count = 
+COUNTROWS(
+    FILTER(
+        VALUES(dim_customers[customer_id]),
+        [Total Gross Volume GMV] >= 25000 && [Failure Rate %] >= 0.20
+    )
+)
+
+/// <summary>
+/// Total gross volume generated by High-Value At-Risk customers.
+/// </summary>
+At-Risk Customer Spend = 
+CALCULATE(
+    [Total Gross Volume GMV],
+    FILTER(
+        VALUES(dim_customers[customer_id]),
+        [Failure Rate %] >= 0.20 && [Total Gross Volume GMV] >= 25000
+    )
+)
+
+/// <summary>
+/// Percentage of total GMV at risk from high-value churn accounts.
+/// </summary>
+At-Risk Customer Spend Share % = 
+DIVIDE(
+    [At-Risk Customer Spend],
+    [Total Gross Volume GMV],
+    0
+)
+
+
+
+// ============================================================================
+// SECTION 5: MERCHANT PERFORMANCE & PARETO CONCENTRATION
+// ============================================================================
+
+/// <summary>
+/// Total count of onboarded merchant accounts.
+/// </summary>
+Total Merchants = 
+DISTINCTCOUNT(dim_merchants[merchant_id])
+
+/// <summary>
+/// Count of active merchants experiencing failed transactions.
+/// </summary>
+Merchants with Failures Count = 
+COUNTROWS(
+    FILTER(
+        VALUES(dim_merchants[merchant_id]),
+        [Failed Transactions] > 0
+    )
+)
+
+/// <summary>
+/// Average revenue lost per merchant account.
+/// </summary>
+Avg Lost Revenue per Merchant = 
+DIVIDE(
+    [Revenue at Risk (Failed)],
+    [Total Merchants],
+    0
+)
+
+
+
+// ============================================================================
+// SECTION 6: GATEWAY SLA & OPERATIONAL RELIABILITY METRICS
+// ============================================================================
+
+/// <summary>
+/// Success rate per gateway / channel partition.
+/// </summary>
+Gateway Success Rate % = 
+DIVIDE(
+    [Successful Transactions],
+    [Total Transactions],
+    0
+)
+
+/// <summary>
+/// Percentage rate of transactions experiencing Gateway Timeouts.
+/// </summary>
+Gateway Timeout Rate % = 
+DIVIDE(
+    CALCULATE([Total Transactions], dim_failure_reasons[failure_reason_code] = "GATEWAY_TIMEOUT"),
+    [Total Transactions],
+    0
+)
+
+/// <summary>
+/// Percentage rate of transactions experiencing Technical Errors.
+/// </summary>
+Technical Error Rate % = 
+DIVIDE(
+    CALCULATE([Total Transactions], dim_failure_reasons[failure_reason_code] = "TECHNICAL_ERROR"),
+    [Total Transactions],
+    0
+)
+
+/// <summary>
+/// Gateway SLA Compliance Status Flag: Meets 86.50% success SLA threshold.
+/// </summary>
+Gateway SLA Status = 
+IF(
+    [Gateway Success Rate %] >= 0.865,
+    "SLA Compliant (>= 86.5%)",
+    "SLA Breach (< 86.5%)"
+)
