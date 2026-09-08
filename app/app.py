@@ -224,7 +224,8 @@ with st.sidebar:
     st.markdown("### 🏛️ Star Schema Visualizer")
     try:
         schema_meta = db_engine.get_schema_metadata()
-        st.caption(f"Engine: **{schema_meta['engine']}** | Records: **348,107 Total**")
+        total_records = sum(t_info.get("rows", 0) for t_info in schema_meta["tables"].values())
+        st.caption(f"Engine: **{schema_meta['engine']}** | Records: **{total_records:,} Total**")
         
         for table_name, t_info in schema_meta["tables"].items():
             with st.expander(f"📦 {table_name} ({t_info['rows']:,} rows)"):
